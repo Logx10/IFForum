@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Forum DB Schema</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --border: #1e2330;
+    --accent: #4f8ef7;
+    --accent2: #f7614f;
+    --accent3: #4ff7a8;
+    --accent4: #f7c94f;
+    --text: #c9d1e0;
+    --muted: #4a5270;
+    --pk: #f7614f;
+    --fk: #4f8ef7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    padding: 48px 32px;
+    overflow-x: auto;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+  }
+
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .table-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(79,142,247,.12);
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.02);
+  }
+
+  .table-icon {
+    font-size: 1.1rem;
+  }
+
+  .table-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: .5px;
+    color: #fff;
+  }
+
+  .row-count {
+    margin-left: auto;
+    font-size: .7rem;
+    color: var(--muted);
+    background: var(--border);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .78rem;
+  }
+
+  tr:not(:last-child) td {
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 8px 18px;
+    vertical-align: middle;
+  }
+
+  .col-name {
+    color: var(--text);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .col-type {
+    color: var(--accent3);
+    font-size: .72rem;
+    white-space: nowrap;
+  }
+
+  .col-flags {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: .65rem;
+    font-weight: 700;
+    margin-left: 3px;
+  }
+
+  .pk   { background: rgba(247,97,79,.15); color: var(--pk); }
+  .fk   { background: rgba(79,142,247,.15); color: var(--fk); }
+  .idx  { background: rgba(79,247,168,.1);  color: var(--accent3); }
+  .uniq { background: rgba(247,201,79,.1);  color: var(--accent4); }
+  .null { color: var(--muted); font-size: .65rem; font-style: italic; }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    font-size: .75rem;
+    color: var(--muted);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+
+  .relations-section {
+    margin-top: 48px;
+    max-width: 1400px;
+  }
+
+  .relations-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .rel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .rel-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: .75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rel-item .arrow { color: var(--accent); }
+  .rel-item .type  { color: var(--muted); font-size: .65rem; }
+</style>
+</head>
+<body>
+
+<h1>Forum — Database Schema</h1>
+<p class="subtitle">Laravel + MySQL · 8 tabelas · gerado automaticamente</p>
+
+<div class="grid">
+
+  <!-- USERS -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">👤</span>
+      <span class="table-name">users</span>
+      <span class="row-count">auth + perfil</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">name</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">username</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge uniq">UQ</span></td></tr>
+      <tr><td class="col-name">email</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge uniq">UQ</span></td></tr>
+      <tr><td class="col-name">password</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">avatar</td><td class="col-type">varchar</td><td class="col-flags"><span class="null">null</span></td></tr>
+      <tr><td class="col-name">bio</td><td class="col-type">text</td><td class="col-flags"><span class="null">null</span></td></tr>
+      <tr><td class="col-name">role</td><td class="col-type">enum</td><td><span class="null">user|mod|admin</span></td></tr>
+      <tr><td class="col-name">is_banned</td><td class="col-type">boolean</td><td></td></tr>
+      <tr><td class="col-name">deleted_at</td><td class="col-type">timestamp</td><td class="col-flags"><span class="null">softdelete</span></td></tr>
+    </table>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">📂</span>
+      <span class="table-name">categories</span>
+      <span class="row-count">hierárquica</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">name</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">slug</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge uniq">UQ</span></td></tr>
+      <tr><td class="col-name">description</td><td class="col-type">text</td><td class="col-flags"><span class="null">null</span></td></tr>
+      <tr><td class="col-name">icon</td><td class="col-type">varchar</td><td class="col-flags"><span class="null">null</span></td></tr>
+      <tr><td class="col-name">color</td><td class="col-type">char(7)</td><td></td></tr>
+      <tr><td class="col-name">parent_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span><span class="null"> null</span></td></tr>
+      <tr><td class="col-name">order</td><td class="col-type">int</td><td></td></tr>
+      <tr><td class="col-name">is_active</td><td class="col-type">boolean</td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- POSTS -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">📝</span>
+      <span class="table-name">posts</span>
+      <span class="row-count">thread principal</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">title</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge idx">FT</span></td></tr>
+      <tr><td class="col-name">slug</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge uniq">UQ</span></td></tr>
+      <tr><td class="col-name">body</td><td class="col-type">longtext</td><td class="col-flags"><span class="badge idx">FT</span></td></tr>
+      <tr><td class="col-name">user_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">category_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">status</td><td class="col-type">enum</td><td><span class="null">draft|pub|lock|arch</span></td></tr>
+      <tr><td class="col-name">is_pinned</td><td class="col-type">boolean</td><td></td></tr>
+      <tr><td class="col-name">views_count</td><td class="col-type">bigint</td><td></td></tr>
+      <tr><td class="col-name">comments_count</td><td class="col-type">bigint</td><td><span class="null">cache</span></td></tr>
+      <tr><td class="col-name">likes_count</td><td class="col-type">bigint</td><td><span class="null">cache</span></td></tr>
+      <tr><td class="col-name">last_activity_at</td><td class="col-type">timestamp</td><td class="col-flags"><span class="badge idx">IDX</span></td></tr>
+      <tr><td class="col-name">deleted_at</td><td class="col-type">timestamp</td><td class="col-flags"><span class="null">softdelete</span></td></tr>
+    </table>
+  </div>
+
+  <!-- COMMENTS -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">💬</span>
+      <span class="table-name">comments</span>
+      <span class="row-count">nested replies</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">body</td><td class="col-type">longtext</td><td></td></tr>
+      <tr><td class="col-name">user_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">post_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">parent_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span><span class="null"> null</span></td></tr>
+      <tr><td class="col-name">likes_count</td><td class="col-type">bigint</td><td><span class="null">cache</span></td></tr>
+      <tr><td class="col-name">is_solution</td><td class="col-type">boolean</td><td></td></tr>
+      <tr><td class="col-name">is_hidden</td><td class="col-type">boolean</td><td></td></tr>
+      <tr><td class="col-name">deleted_at</td><td class="col-type">timestamp</td><td class="col-flags"><span class="null">softdelete</span></td></tr>
+    </table>
+  </div>
+
+  <!-- LIKES -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">❤️</span>
+      <span class="table-name">likes</span>
+      <span class="row-count">polimórfico</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">user_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">likeable_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge idx">IDX</span></td></tr>
+      <tr><td class="col-name">likeable_type</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge idx">IDX</span></td></tr>
+      <tr><td class="col-name">type</td><td class="col-type">enum</td><td><span class="null">like|dislike</span></td></tr>
+      <tr><td class="col-name">created_at</td><td class="col-type">timestamp</td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- TAGS -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">🏷️</span>
+      <span class="table-name">tags + post_tag</span>
+      <span class="row-count">many-to-many</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">name</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge uniq">UQ</span></td></tr>
+      <tr><td class="col-name">slug</td><td class="col-type">varchar</td><td class="col-flags"><span class="badge uniq">UQ</span></td></tr>
+      <tr><td class="col-name">color</td><td class="col-type">char(7)</td><td></td></tr>
+      <tr><td colspan="3" style="padding:8px 18px;color:var(--muted);font-size:.7rem;border-top:1px dashed var(--border)">pivot: post_tag(post_id FK, tag_id FK)</td></tr>
+    </table>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">🔔</span>
+      <span class="table-name">notifications</span>
+      <span class="row-count">polimórfico</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">uuid</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">user_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">type</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">notifiable_id</td><td class="col-type">bigint</td><td></td></tr>
+      <tr><td class="col-name">notifiable_type</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">data</td><td class="col-type">json</td><td></td></tr>
+      <tr><td class="col-name">read_at</td><td class="col-type">timestamp</td><td class="col-flags"><span class="null">null</span></td></tr>
+    </table>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-icon">🚩</span>
+      <span class="table-name">reports</span>
+      <span class="row-count">moderação</span>
+    </div>
+    <table>
+      <tr><td class="col-name">id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge pk">PK</span></td></tr>
+      <tr><td class="col-name">reporter_id</td><td class="col-type">bigint</td><td class="col-flags"><span class="badge fk">FK</span></td></tr>
+      <tr><td class="col-name">reportable_id</td><td class="col-type">bigint</td><td></td></tr>
+      <tr><td class="col-name">reportable_type</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">reason</td><td class="col-type">varchar</td><td></td></tr>
+      <tr><td class="col-name">details</td><td class="col-type">text</td><td class="col-flags"><span class="null">null</span></td></tr>
+      <tr><td class="col-name">status</td><td class="col-type">enum</td><td><span class="null">pending|reviewed|dismissed</span></td></tr>
+    </table>
+  </div>
+
+</div>
+
+<div class="relations-section">
+  <h2>Relacionamentos</h2>
+  <div class="rel-grid">
+    <div class="rel-item">users <span class="arrow">→</span> posts <span class="type">1:N</span></div>
+    <div class="rel-item">users <span class="arrow">→</span> comments <span class="type">1:N</span></div>
+    <div class="rel-item">categories <span class="arrow">→</span> posts <span class="type">1:N</span></div>
+    <div class="rel-item">posts <span class="arrow">→</span> comments <span class="type">1:N</span></div>
+    <div class="rel-item">comments <span class="arrow">→</span> comments <span class="type">self 1:N (replies)</span></div>
+    <div class="rel-item">posts/comments <span class="arrow">→</span> likes <span class="type">polymorphic</span></div>
+    <div class="rel-item">posts <span class="arrow">↔</span> tags <span class="type">M:N via post_tag</span></div>
+    <div class="rel-item">users <span class="arrow">↔</span> posts <span class="type">M:N via post_follows</span></div>
+    <div class="rel-item">categories <span class="arrow">→</span> categories <span class="type">self (subcategorias)</span></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="badge pk">PK</span> Primary Key</div>
+  <div class="legend-item"><span class="badge fk">FK</span> Foreign Key</div>
+  <div class="legend-item"><span class="badge uniq">UQ</span> Unique</div>
+  <div class="legend-item"><span class="badge idx">IDX/FT</span> Index / Full-Text</div>
+  <div class="legend-item"><span class="null">null</span> Nullable</div>
+</div>
+
+</body>
+</html>
