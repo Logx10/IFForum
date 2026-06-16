@@ -25,7 +25,22 @@ export default function Navbar({ isMobile, onNewPost, showNewPost = true }) {
     const { auth } = usePage().props
     const user = auth?.user
     const [dropdownOpen, setDropdownOpen] = useState(false)
+    const [searchOpen,   setSearchOpen]   = useState(false)
+    const [searchText,   setSearchText]   = useState('')
     const dropdownRef = useRef(null)
+    const searchRef   = useRef(null)
+
+    function handleSearch(e) {
+        e.preventDefault()
+        if (!searchText.trim()) return
+        router.get('/', { search: searchText.trim() }, { preserveScroll: false })
+        setSearchOpen(false)
+        setSearchText('')
+    }
+
+    function handleSearchKey(e) {
+        if (e.key === 'Escape') { setSearchOpen(false); setSearchText('') }
+    }
 
     // Fecha dropdown ao clicar fora
     useEffect(() => {
@@ -65,6 +80,31 @@ export default function Navbar({ isMobile, onNewPost, showNewPost = true }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 
                     {/* Botão novo post no mobile */}
+                    {isMobile && (
+                        <>
+                            {searchOpen
+                                ? (
+                                    <form onSubmit={handleSearch} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                        <input
+                                            ref={searchRef}
+                                            autoFocus
+                                            type="text"
+                                            value={searchText}
+                                            placeholder="Buscar..."
+                                            onChange={e => setSearchText(e.target.value)}
+                                            onKeyDown={handleSearchKey}
+                                            style={{ padding: '6px 12px', borderRadius: 20, border: 'none', fontSize: 13, background: 'rgba(255,255,255,0.2)', color: '#fff', outline: 'none', width: 140 }}
+                                        />
+                                        <button type="submit" style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18, padding: 0 }}>→</button>
+                                        <button type="button" onClick={() => { setSearchOpen(false); setSearchText('') }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: 18, padding: 0 }}>×</button>
+                                    </form>
+                                ) : (
+                                    <button onClick={() => setSearchOpen(true)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 20, padding: '4px 6px' }}>🔍</button>
+                                )
+                            }
+                        </>
+                    )}
+
                     {isMobile && showNewPost && onNewPost && (
                         <button onClick={onNewPost} style={{
                             background: '#fff', border: 'none', borderRadius: 6,
