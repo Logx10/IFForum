@@ -6,6 +6,14 @@ cmds = [
 
 [phases.install]
 cmds = [
+  "php -v",
+  "which php",
+  "composer --version",
+  "composer install --no-dev --optimize-autoloader --no-scripts --no-interaction"
+]
+
+[phases.install]
+cmds = [
   "composer install --no-dev --optimize-autoloader --no-scripts --no-interaction",
   "npm ci",
   "npm run build"
