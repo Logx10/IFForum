@@ -19,6 +19,8 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
+  "php -i | grep 'Client API version'",
+  "php -m | grep mysql",
   "php -v",
   "composer --version",
   "composer install --no-dev --optimize-autoloader --no-interaction",
