@@ -4,7 +4,7 @@ Sistema de fórum para a comunidade de estudantes do IFCE Campus Tianguá, desen
 
 ## 🌐 Sistema Online (Deploy)
 
-**URL de acesso:** https://ifforum-production.up.railway.app
+**URL de acesso:** https://ifceconecta.up.railway.app/
 
 Credenciais de demonstração:
 - **Admin:** admin@forum.dev / password  
@@ -161,7 +161,4 @@ Arquivos de configuração do deploy estão na pasta `build/`.
 
 ---
 
-## 👥 Equipe
-
-- Leandro — Desenvolvimento Full Stack
 - IFCE Campus Tianguá — Disciplina de Engenharia de Software
