@@ -140,6 +140,22 @@ Route::get('/perfil/{username}', function (string $username) {
 
     return Inertia::render('Profile', compact('user', 'posts', 'stats'));
 });
+Route::put('/perfil/{username}/capa', function (string $username) {
+    abort_unless(auth()->check(), 401);
+    $user = \App\Models\User::where('username', $username)->firstOrFail();
+    abort_unless(auth()->id() === $user->id, 403);
+
+    $data = request()->validate([
+        'cover_image' => 'nullable|url|max:500',
+    ]);
+
+    $user->update(['cover_image' => $data['cover_image'] ?: null]);
+
+    return response()->json([
+        'cover_image' => $user->cover_image,
+        'message'     => 'Capa atualizada com sucesso!',
+    ]);
+});
 
 // ── Criar post ────────────────────────────────────────────────────────────────
 Route::post('/posts', function () {
